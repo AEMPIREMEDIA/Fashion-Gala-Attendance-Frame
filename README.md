@@ -1,101 +1,52 @@
-<!DOCTYPE html><html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Care Collective Fashion Gala Frame</title>
-  <style>
-    body {
-      background-image: url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAx');
-      background-size: cover;
-      background-position: center;
-      height: 100vh;
-      margin: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      font-family: Arial, sans-serif;
-    }.container {
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 15px;
-  padding: 20px;
-  text-align: center;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
-}
+import React, { useState } from "react"; import { Button } from "@/components/ui/button"; import { Card, CardContent } from "@/components/ui/card";
 
-canvas {
-  margin-top: 20px;
-  border-radius: 50%;
-}
+export default function FashionGalaFramePage() { const [image, setImage] = useState(null); const [framedImageUrl, setFramedImageUrl] = useState(null);
 
-input, button {
-  margin: 10px;
-}
+const handleImageUpload = (e) => { const file = e.target.files[0]; if (file) { const reader = new FileReader(); reader.onloadend = () => { setImage(reader.result); generateFramedImage(reader.result); }; reader.readAsDataURL(file); } };
 
-#nameInput {
-  padding: 8px;
-  font-size: 16px;
-  width: 250px;
-}
+const generateFramedImage = (imgSrc) => { const canvas = document.createElement("canvas"); const ctx = canvas.getContext("2d"); const frameImage = new Image(); const userImage = new Image();
 
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h2>Care Collective Fashion Gala Frame</h2>
-    <input type="file" id="imageUpload" accept="image/*" />
-    <br />
-    <input type="text" id="nameInput" placeholder="Enter your name" />
-    <br />
-    <button onclick="generateImage()">Generate Image</button>
-    <a id="downloadLink" style="display: none;" download="care_collective_frame.png">Download Image</a>
-    <canvas id="canvas" width="400" height="400"></canvas>
-  </div>  <script>
-    const logo = new Image();
-    logo.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACgCAYAAACLz2ctAAABBmlDQ1BJQ0MgUHJvZmlsZQAAeJxjYGCSYAACJgEGhty8kqIgdyeF'; // Truncated for brevity
+frameImage.crossOrigin = "anonymous";
+frameImage.src = "/frame.png"; // Use your frame image path
+userImage.src = imgSrc;
 
-    function generateImage() {
-      const fileInput = document.getElementById('imageUpload');
-      const name = document.getElementById('nameInput').value;
-      const canvas = document.getElementById('canvas');
-      const ctx = canvas.getContext('2d');
+userImage.onload = () => {
+  canvas.width = 600;
+  canvas.height = 600;
+  ctx.drawImage(userImage, 0, 0, 600, 600);
+  frameImage.onload = () => {
+    ctx.drawImage(frameImage, 0, 0, 600, 600);
+    setFramedImageUrl(canvas.toDataURL("image/png"));
+  };
+};
 
-      if (!fileInput.files[0]) return alert('Please upload a picture');
+};
 
-      const reader = new FileReader();
-      reader.onload = function(event) {
-        const uploadedImage = new Image();
-        uploadedImage.onload = function() {
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
+const handleDownload = () => { const link = document.createElement("a"); link.href = framedImageUrl; link.download = "fashion_gala_frame.png"; link.click(); };
 
-          // Draw circular clipped user image
-          ctx.save();
-          ctx.beginPath();
-          ctx.arc(200, 200, 180, 0, Math.PI * 2, true);
-          ctx.closePath();
-          ctx.clip();
-          ctx.drawImage(uploadedImage, 0, 0, 400, 400);
-          ctx.restore();
+return ( <div className="min-h-screen bg-white p-6 flex flex-col items-center justify-start"> <header className="w-full text-center mb-8"> <h1 className="text-4xl font-extrabold text-black mb-2"> Care Collective Fashion Gala Show 2025 </h1> <p className="text-lg text-gray-700"> Happening live on Facebook, April 6th, 2025 at 3 PM </p> </header>
 
-          // Draw the logo
-          ctx.drawImage(logo, 120, 120, 160, 160);
+<Card className="w-full max-w-md p-4 mb-4">
+    <CardContent className="flex flex-col items-center">
+      <input
+        type="file"
+        accept="image/*"
+        onChange={handleImageUpload}
+        className="mb-4"
+      />
+      {framedImageUrl && (
+        <>
+          <img
+            src={framedImageUrl}
+            alt="Framed Upload"
+            className="rounded-xl shadow-md mb-4"
+          />
+          <Button onClick={handleDownload}>Download Framed Image</Button>
+        </>
+      )}
+    </CardContent>
+  </Card>
+</div>
 
-          // Add text overlay
-          ctx.fillStyle = '#00cc00';
-          ctx.font = '16px Arial';
-          ctx.textAlign = 'center';
-          ctx.fillText('I will be Attending Care Collective', 200, 330);
-          ctx.fillText('Fashion Gala Show on Sunday 6th April, 2025', 200, 350);
-          ctx.fillText('by 3pm Nigerian time', 200, 370);
-          ctx.fillText(name, 200, 390);
+); }
 
-          const downloadLink = document.getElementById('downloadLink');
-          downloadLink.href = canvas.toDataURL();
-          downloadLink.style.display = 'inline';
-        };
-        uploadedImage.src = event.target.result;
-      };
-      reader.readAsDataURL(fileInput.files[0]);
-    }
-  </script></body>
-</html>
