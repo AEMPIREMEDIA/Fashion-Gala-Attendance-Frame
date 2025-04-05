@@ -1,101 +1,103 @@
-<!DOCTYPE html><html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Care Collective Fashion Gala Frame</title>
-  <style>
-    body {
-      background-image: url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAx');
-      background-size: cover;
-      background-position: center;
-      height: 100vh;
-      margin: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      font-family: Arial, sans-serif;
-    }.container {
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 15px;
-  padding: 20px;
-  text-align: center;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
-}
+import React, { useState, useRef } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 
-canvas {
-  margin-top: 20px;
-  border-radius: 50%;
-}
+export default function PhotoFrameUploader() {
+  const [image, setImage] = useState(null);
+  const frameRef = useRef();
 
-input, button {
-  margin: 10px;
-}
-
-#nameInput {
-  padding: 8px;
-  font-size: 16px;
-  width: 250px;
-}
-
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h2>Care Collective Fashion Gala Frame</h2>
-    <input type="file" id="imageUpload" accept="image/*" />
-    <br />
-    <input type="text" id="nameInput" placeholder="Enter your name" />
-    <br />
-    <button onclick="generateImage()">Generate Image</button>
-    <a id="downloadLink" style="display: none;" download="care_collective_frame.png">Download Image</a>
-    <canvas id="canvas" width="400" height="400"></canvas>
-  </div>  <script>
-    const logo = new Image();
-    logo.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACgCAYAAACLz2ctAAABBmlDQ1BJQ0MgUHJvZmlsZQAAeJxjYGCSYAACJgEGhty8kqIgdyeF'; // Truncated for brevity
-
-    function generateImage() {
-      const fileInput = document.getElementById('imageUpload');
-      const name = document.getElementById('nameInput').value;
-      const canvas = document.getElementById('canvas');
-      const ctx = canvas.getContext('2d');
-
-      if (!fileInput.files[0]) return alert('Please upload a picture');
-
+  const handleImageUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
       const reader = new FileReader();
-      reader.onload = function(event) {
-        const uploadedImage = new Image();
-        uploadedImage.onload = function() {
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-          // Draw circular clipped user image
-          ctx.save();
-          ctx.beginPath();
-          ctx.arc(200, 200, 180, 0, Math.PI * 2, true);
-          ctx.closePath();
-          ctx.clip();
-          ctx.drawImage(uploadedImage, 0, 0, 400, 400);
-          ctx.restore();
-
-          // Draw the logo
-          ctx.drawImage(logo, 120, 120, 160, 160);
-
-          // Add text overlay
-          ctx.fillStyle = '#00cc00';
-          ctx.font = '16px Arial';
-          ctx.textAlign = 'center';
-          ctx.fillText('I will be Attending Care Collective', 200, 330);
-          ctx.fillText('Fashion Gala Show on Sunday 6th April, 2025', 200, 350);
-          ctx.fillText('by 3pm Nigerian time', 200, 370);
-          ctx.fillText(name, 200, 390);
-
-          const downloadLink = document.getElementById('downloadLink');
-          downloadLink.href = canvas.toDataURL();
-          downloadLink.style.display = 'inline';
-        };
-        uploadedImage.src = event.target.result;
+      reader.onload = (e) => {
+        setImage(e.target.result);
       };
-      reader.readAsDataURL(fileInput.files[0]);
+      reader.readAsDataURL(file);
     }
-  </script></body>
-</html>
+  };
+
+  const handleDownload = () => {
+    if (!frameRef.current || !image) return;
+
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+
+    img.onload = () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+
+      context.drawImage(img, 0, 0);
+
+      // Label text
+      const label =
+        "I WILL BE ATTENDING CARE COLLECTIVE FASHION GALA SHOW 2025 ON SUNDAY BY 3PM";
+
+      // Draw label background
+      context.fillStyle = "rgba(144, 238, 144, 0.8)";
+      context.fillRect(0, img.height - 50, img.width, 50);
+
+      // Draw label text
+      context.font = "20px Arial";
+      context.fillStyle = "black";
+      context.fillText(label, 10, img.height - 25);
+
+      const link = document.createElement("a");
+      link.download = "framed-photo.png";
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    };
+
+    img.src = image;
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
+      <h1 className="text-2xl font-bold mb-6 text-center">
+        Upload Your Photo for the Care Collective Fashion Gala Show 2025
+      </h1>
+
+      <input
+        type="file"
+        accept="image/*"
+        onChange={handleImageUpload}
+        className="mb-4"
+      />
+
+      <Card className="w-full max-w-md p-4 bg-white shadow-lg">
+        <CardContent
+          ref={frameRef}
+          className="relative w-full h-96 border-4 border-green-300 rounded-2xl overflow-hidden"
+        >
+          {image ? (
+            <img
+              src={image}
+              alt="Uploaded"
+              className="object-cover w-full h-full"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-gray-400">
+              No photo uploaded
+            </div>
+          )}
+
+          <div className="absolute bottom-0 w-full bg-green-200 bg-opacity-80 text-center py-2 text-sm font-semibold">
+            <span className="text-black">I WILL BE ATTENDING </span>
+            <span className="text-red-600">
+              CARE COLLECTIVE FASHION GALA SHOW 2025
+            </span>
+            <span className="text-black"> ON SUNDAY BY 3PM</span>
+          </div>
+        </CardContent>
+      </Card>
+
+      {image && (
+        <Button className="mt-4" onClick={handleDownload}>
+          Download Framed Photo
+        </Button>
+      )}
+    </div>
+  );
+}
