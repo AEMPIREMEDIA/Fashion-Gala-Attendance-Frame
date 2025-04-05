@@ -1,103 +1,101 @@
-<!DOCTYPE html><html lang="en"><head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Care Collective Fashion Gala</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #f8f8f8;
-        }
-        .container {
-            margin-top: 20px;
-        }
-        .frame {
-            width: 300px;
-            height: 400px;
-            border: 5px solid #ff69b4;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background-color: white;
-            margin: auto;
-            position: relative;
-        }
-        .frame img {
-            max-width: 90%;
-            max-height: 70%;
-        }
-        .caption {
-            position: absolute;
-            bottom: 10px;
-            width: 100%;
-            font-size: 14px;
-            background-color: rgba(255, 105, 180, 0.8);
-            color: white;
-            padding: 5px;
-        }
-        #download {
-            margin-top: 10px;
-            padding: 10px 20px;
-            background-color: #ff69b4;
-            color: white;
-            border: none;
-            cursor: pointer;
-            display: none;
-        }
-        @media (max-width: 400px) {
-            .frame {
-                width: 90%;
-                height: auto;
-            }
-            .frame img {
-                max-height: 60%;
-            }
-        }
-    </style>
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Care Collective Fashion Gala Frame</title>
+  <style>
+    body {
+      background-image: url('data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAx');
+      background-size: cover;
+      background-position: center;
+      height: 100vh;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      font-family: Arial, sans-serif;
+    }.container {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 15px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+}
+
+canvas {
+  margin-top: 20px;
+  border-radius: 50%;
+}
+
+input, button {
+  margin: 10px;
+}
+
+#nameInput {
+  padding: 8px;
+  font-size: 16px;
+  width: 250px;
+}
+
+  </style>
 </head>
 <body>
-    <h1>Care Collective Live Facebook Fashion Gala Show</h1>
-    <p>Join us on Sunday, April 6th!</p>
-    <div class="container">
-        <input type="file" id="upload" accept="image/*">
-        <div class="frame" id="photo-frame">
-            <p>Upload your photo here</p>
-            <div class="caption">I am attending the Care Collective Fashion Gala!</div>
-        </div>
-        <button id="download">Download Image</button>
-    </div>
-    <script>
-        document.getElementById('upload').addEventListener('change', function(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
-                    img.alt = 'User uploaded photo for the Fashion Gala frame';
-                    const frame = document.getElementById('photo-frame');
-                    frame.innerHTML = '';
-                    frame.appendChild(img);
-                    const caption = document.createElement('div');
-                    caption.className = 'caption';
-                    caption.innerText = 'I am attending the Care Collective Fashion Gala!';
-                    frame.appendChild(caption);
-                    document.getElementById('download').style.display = 'block';
-                };
-                reader.readAsDataURL(file);
-            }
-        });document.getElementById('download').addEventListener('click', function() {
-        const frame = document.getElementById('photo-frame');
-        html2canvas(frame).then(canvas => {
-            const link = document.createElement('a');
-            link.href = canvas.toDataURL('image/png');
-            link.download = 'fashion_gala_attendee.png';
-            link.click();
-        });
-    });
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <div class="container">
+    <h2>Care Collective Fashion Gala Frame</h2>
+    <input type="file" id="imageUpload" accept="image/*" />
+    <br />
+    <input type="text" id="nameInput" placeholder="Enter your name" />
+    <br />
+    <button onclick="generateImage()">Generate Image</button>
+    <a id="downloadLink" style="display: none;" download="care_collective_frame.png">Download Image</a>
+    <canvas id="canvas" width="400" height="400"></canvas>
+  </div>  <script>
+    const logo = new Image();
+    logo.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACgCAYAAACLz2ctAAABBmlDQ1BJQ0MgUHJvZmlsZQAAeJxjYGCSYAACJgEGhty8kqIgdyeF'; // Truncated for brevity
 
-</body>
+    function generateImage() {
+      const fileInput = document.getElementById('imageUpload');
+      const name = document.getElementById('nameInput').value;
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
+
+      if (!fileInput.files[0]) return alert('Please upload a picture');
+
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const uploadedImage = new Image();
+        uploadedImage.onload = function() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+          // Draw circular clipped user image
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(200, 200, 180, 0, Math.PI * 2, true);
+          ctx.closePath();
+          ctx.clip();
+          ctx.drawImage(uploadedImage, 0, 0, 400, 400);
+          ctx.restore();
+
+          // Draw the logo
+          ctx.drawImage(logo, 120, 120, 160, 160);
+
+          // Add text overlay
+          ctx.fillStyle = '#00cc00';
+          ctx.font = '16px Arial';
+          ctx.textAlign = 'center';
+          ctx.fillText('I will be Attending Care Collective', 200, 330);
+          ctx.fillText('Fashion Gala Show on Sunday 6th April, 2025', 200, 350);
+          ctx.fillText('by 3pm Nigerian time', 200, 370);
+          ctx.fillText(name, 200, 390);
+
+          const downloadLink = document.getElementById('downloadLink');
+          downloadLink.href = canvas.toDataURL();
+          downloadLink.style.display = 'inline';
+        };
+        uploadedImage.src = event.target.result;
+      };
+      reader.readAsDataURL(fileInput.files[0]);
+    }
+  </script></body>
 </html>
