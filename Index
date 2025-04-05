@@ -1,52 +1,79 @@
-import React, { useState } from "react"; import { Button } from "@/components/ui/button"; import { Card, CardContent } from "@/components/ui/card";
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Photo Frame Uploader</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    .frame {
+      border: 10px solid #ff66cc;
+      padding: 10px;
+      background: white;
+      display: inline-block;
+      position: relative;
+    }
+    .frame img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+    .caption {
+      background: #ff66cc;
+      color: white;
+      padding: 10px;
+      font-size: 18px;
+    }
+    #download {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #ff66cc;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    input[type="file"] {
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Upload Your Photo</h1>
+  <input type="file" id="imageUpload" accept="image/*">
+  <div id="photoArea" class="frame" style="display:none;">
+    <img id="uploadedImage" src="" alt="Uploaded">
+    <div class="caption">I am attending the Care Collective Fashion Gala!</div>
+  </div>
+  <button id="download" style="display:none;">Download Framed Image</button>  <script>
+    const imageUpload = document.getElementById('imageUpload');
+    const uploadedImage = document.getElementById('uploadedImage');
+    const photoArea = document.getElementById('photoArea');
+    const downloadButton = document.getElementById('download');
 
-export default function FashionGalaFramePage() { const [image, setImage] = useState(null); const [framedImageUrl, setFramedImageUrl] = useState(null);
+    imageUpload.addEventListener('change', function(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          uploadedImage.src = e.target.result;
+          photoArea.style.display = 'inline-block';
+          downloadButton.style.display = 'inline-block';
+        }
+        reader.readAsDataURL(file);
+      }
+    });
 
-const handleImageUpload = (e) => { const file = e.target.files[0]; if (file) { const reader = new FileReader(); reader.onloadend = () => { setImage(reader.result); generateFramedImage(reader.result); }; reader.readAsDataURL(file); } };
-
-const generateFramedImage = (imgSrc) => { const canvas = document.createElement("canvas"); const ctx = canvas.getContext("2d"); const frameImage = new Image(); const userImage = new Image();
-
-frameImage.crossOrigin = "anonymous";
-frameImage.src = "/frame.png"; // Use your frame image path
-userImage.src = imgSrc;
-
-userImage.onload = () => {
-  canvas.width = 600;
-  canvas.height = 600;
-  ctx.drawImage(userImage, 0, 0, 600, 600);
-  frameImage.onload = () => {
-    ctx.drawImage(frameImage, 0, 0, 600, 600);
-    setFramedImageUrl(canvas.toDataURL("image/png"));
-  };
-};
-
-};
-
-const handleDownload = () => { const link = document.createElement("a"); link.href = framedImageUrl; link.download = "fashion_gala_frame.png"; link.click(); };
-
-return ( <div className="min-h-screen bg-white p-6 flex flex-col items-center justify-start"> <header className="w-full text-center mb-8"> <h1 className="text-4xl font-extrabold text-black mb-2"> Care Collective Fashion Gala Show 2025 </h1> <p className="text-lg text-gray-700"> Happening live on Facebook, April 6th, 2025 at 3 PM </p> </header>
-
-<Card className="w-full max-w-md p-4 mb-4">
-    <CardContent className="flex flex-col items-center">
-      <input
-        type="file"
-        accept="image/*"
-        onChange={handleImageUpload}
-        className="mb-4"
-      />
-      {framedImageUrl && (
-        <>
-          <img
-            src={framedImageUrl}
-            alt="Framed Upload"
-            className="rounded-xl shadow-md mb-4"
-          />
-          <Button onClick={handleDownload}>Download Framed Image</Button>
-        </>
-      )}
-    </CardContent>
-  </Card>
-</div>
-
-); }
-
+    downloadButton.addEventListener('click', function() {
+      html2canvas(photoArea).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'framed-photo.png';
+        link.href = canvas.toDataURL();
+        link.click();
+      });
+    });
+  </script>  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script></body>
+</html>
